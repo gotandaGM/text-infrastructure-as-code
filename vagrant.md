@@ -1,18 +1,9 @@
-# Vagrant/Ansible/Serverspec
-
-## 概要
-
-このハンズオンでは, プロダクト開発時に役立つ各種ツールの紹介を行います.
-ローカルの開発環境を簡単に構築出来るVagrant, サーバの環境構築やアプリケーションのデプロイなどに有用なAnsible, そしてアプリケーションをテストするようにサーバをテストすることが出来るServerspecという, 3つのツールについて紹介します.
-
-また, コラムとして, VagrantだけでなくDockerのイメージやAmazon EC2のAMI, Google Computer Engineのイメージなどを生成出来るPackerというツールにも触れる予定です.
-
-## Vagrant
+# Vagrantとは
 
 Vagrant(ベイグラント)は, Rubyで開発されたオープンソースの仮想環境開発構築ソフトウェアです.
 Vagrantを利用することで, 仮想マシン(Virutal Machine, VM)と呼ばれる｢仮想的な作業環境｣を, ローカル環境上に構築することができます.
 
-### Vagrantのインストール
+# Vagrantのインストール
 
 もし, Homebrew Caskを導入済みであれば, 次のコマンドでインストールすることが出来ます.
 
@@ -38,7 +29,7 @@ Homebrew Caskを利用していないのであれば, 次の手順に従ってVa
 
 ![](img/vagrant_installed.png)
 
-### VirtualBoxのインストール
+# VirtualBoxのインストール
 
 続いて, Vagrantが仮想環境を構築するために利用する, VirtualBoxをインストールします.
 VirtualBoxは, もしHomebrew Caskを導入済みであれば, 次のコマンドでインストールすることが出来ます.
@@ -59,7 +50,7 @@ Homebrew Caskを利用していないのであれば, 次の手順に従ってVa
 
 - 後は, Vagrantのインストール時と同じく, 指示に従いながら｢続ける｣ボタンを押し続けると, インストールが完了します.
 
-### `vagrant`コマンド
+# `vagrant`コマンド
 
 Vagrantのインストールが無事終わっていれば, コマンドラインから`vagrant`コマンドが利用できるようになっているはずです.
 
@@ -72,7 +63,7 @@ Vagrant 1.7.2
 
 ...それでは, Vagrantを利用して開発環境となる仮想マシンを立ち上げていきましょう.
 
-### Boxの取得
+# Boxの取得
 
 Vagrantでは, ｢Box｣と呼ばれる仮想マシンのベースイメージ(雛形)から仮想マシンを構築します.
 通常, VirtualBoxやVMwareで仮想マシンを立ち上げた場合, そこから更にOSのインストールなどを実施していく必要があります.
@@ -107,11 +98,11 @@ $ vagrant box list
 ubuntu/trusty64 (virtualbox, 14.04)
 ```
 
-#### 練習問題
+## 練習問題
 
 Discovery Vagrant Boxesから, CentOS 6.6及びCentOS 6.7のBoxを検索し, 取得してみよう.
 
-### Vagrantfileの準備
+# Vagrantfileの準備
 
 それでは, 先程取得したBoxから, 仮想マシンを構築していきます.
 そのために, `vagrant init`コマンドで｢Vagrantfile｣と呼ばれるVagrant用の設定ファイルを生成します.
@@ -144,7 +135,7 @@ VagrantfileはRubyで書かれており, ここでは起動するBox(`config.vm.
 
 これで, Vagrantで仮想マシンを立ち上げる準備が出来ました!
 
-### 仮想マシンの起動
+# 仮想マシンの起動
 
 Vagrantによる仮想マシンの起動は, Vagrantfileがあるディレクトリで`vagrant up`すればOKです.
 
@@ -212,14 +203,14 @@ simply run `vagrant up`.
 `running`になっており, 問題なく動いている事がわかります.
 それでは引き続き, Vagrantが用意した仮想マシンに接続してみましょう.
 
-#### コラム: Vagrantfileの共有
+## コラム: Vagrantfileの共有
 
 チームで開発を進めている場合, 開発環境を構築するためのVagrantfileはリポジトリに含めておくようにしましょう.
 他の開発メンバーも, そのVagrantfileを利用して, 開発環境を構築出来るようになります.
 
 もし, リポジトリで共有したVagrantfileから`vagrant up`した際, Vagrantfile内で指定しているBoxが追加されていない場合, Vagrantは自動的にDiscovery Vagrant Boxesから該当するBoxを検索し, あればそのBoxを追加してから仮想マシンの構築をスタートします.
 
-### 仮想マシンへの接続
+# 仮想マシンへの接続
 
 Vagrantで立ち上げた仮想マシンへの接続方法はいくつかあります.
 ひとつは, Vagrantfileがあるディレクトリで`vagrant ssh`と入力する方法です.
@@ -296,7 +287,7 @@ $ vagrant ssh-config --host vagrant-tutorial >> ~/.ssh/config
 $ ssh vagrant-tutorial
 ```
 
-#### コラム: 複数の仮想マシンの立ち上げ
+## コラム: 複数の仮想マシンの立ち上げ
 
 Vagrantfileを上手く設定すれば, プロダクトに必要な開発環境を, 柔軟に構築することが出来ます.
 例えば, 例としてアプリケーション用とデータベース用の2つの仮想マシンを立ち上げる為のVagrantfileを紹介します.
@@ -373,7 +364,7 @@ vagrant@app:~$
 
 その他, Vagrantfileで設定できる項目については, [公式ドキュメント](http://docs.vagrantup.com/v2/vagrantfile/index.html)([日本語版](http://lab.raqda.com/vagrant/vagrantfile/index.html))に記載があります.
 
-### 仮想マシンの停止
+# 仮想マシンの停止
 
 では次に, 立ち上げた仮想マシンを停止してみましょう.
 仮想マシンは, 動いている限りマシンのリソースを使い続けます.
@@ -471,7 +462,7 @@ data.txt
 
 先程作成した`data.txt`が残っていますね!
 
-### 仮想マシンの削除
+# 仮想マシンの削除
 
 それでは最後に, 仮想マシンを削除しましょう.
 停止している仮想マシンは, メモリやCPUなどのリソースは消費しませんが, ディスク容量は消費し続けます.
@@ -505,7 +496,7 @@ then the machine is not created for that environment.
 ここから, 再度`vagrant up`すれば仮想マシンを作成することができます.
 ただ, 当然ではありますが, 新しい仮想マシンを立ち上げたのと同じ状態ですので, 削除前の仮想マシンで作った`data.txt`は残っていません.
 
-#### コラム: `vagrant`ディレクトリの共有
+## コラム: `vagrant`ディレクトリの共有
 
 `vagrant up`時に, このような出力が出ているはずです.
 
@@ -526,11 +517,11 @@ Vagrantfile
 
 プロダクトのルートディレクトリにVagrantfileを設置して`vagrant up`をすれば, プロダクトのコードが全て`/vagrant`ディレクトリにマウントされるので, 別途GitHubやBitBucketからプロダクトのコードを取得する必要がなくなり, 非常に便利です.
 
-### 練習問題
+# 練習問題
 
 適当なAmon2アプリケーションを, NginxとSupervisorを利用してVagrant上で動かせるように, 環境構築をしてみましょう.
 
-#### アプリケーションの用意
+## アプリケーションの用意
 
 `amon2-setup.pl`で適当なAmon2アプリケーションを用意します.
 
@@ -550,7 +541,7 @@ $ vi SampleApp/cpanfile
 + requires 'Starlet';
 ```
 
-#### Vagrantfileの用意と仮想マシンの起動
+## Vagrantfileの用意と仮想マシンの起動
 
 今回は, 予めいくつか設定しておきたい項目があるので, `vagrant init`ではなく手動でVagrantfileを生成します.
 
@@ -585,7 +576,7 @@ vagrant@vagrant-ubuntu-trusty-64:~$ ls /vagrant
 SampleApp  Vagrantfile
 ```
 
-#### Perlのインストール
+## Perlのインストール
 
 [xbuild](https://github.com/tagomoris/xbuild)を使って仮想マシンにPerlをインストールします.
 まず, `apt-get`で`git`をインストールしてから, xbuildのリポジトリを`/tmp/xbuild`にcloneします.
@@ -630,7 +621,7 @@ vagrant@vagrant-ubuntu-trusty-64:~$ sudo su -
 root@vagrant-ubuntu-trusty-64:~#
 ```
 
-#### Nginxのインストール
+## Nginxのインストール
 
 `apt-get`を利用して, Nginxを導入します.
 SampleAppディレクトリ内のアプリケーションはPSGIサーバのStarletで立ち上げるので, nginxはそのリバースプロキシとして利用します.
@@ -663,7 +654,7 @@ root@vagrant-ubuntu-trusty-64:~# vi /etc/nginx/nginx.conf
   }
 ```
 
-#### Supervisorのインストール
+## Supervisorのインストール
 
 続いて, `apt-get`でプロセス管理ツールのSupervisorを導入します.
 
@@ -690,7 +681,7 @@ root@vagrant-ubuntu-trusty-64:~# vi /etc/supervisor/conf.d/app.conf
 + directory=/vagrant/SampleApp
 ```
 
-#### アプリケーションの起動
+## アプリケーションの起動
 
 `service`コマンドで, NginxとSupervisorを再起動します.
 
@@ -699,7 +690,7 @@ root@vagrant-ubuntu-trusty-64:~# service nginx restart
 root@vagrant-ubuntu-trusty-64:~# service supervisor restart
 ```
 
-#### 動作確認
+## 動作確認
 
 手元のブラウザから, `192.168.30.10`にアクセスしてみましょう.
 
@@ -708,7 +699,7 @@ root@vagrant-ubuntu-trusty-64:~# service supervisor restart
 ここまで問題なく進めることができていれば, このような画面が表示されるはずです!
 これにてアプリケーションの環境構築は終了です. お疲れ様でした!
 
-#### トラブルシューティング
+## トラブルシューティング
 
 もし正常に動作していない場合, その問題の原因になりそう理由の1つは, NginxやSupervisorの設定関連でしょう.
 
@@ -718,7 +709,7 @@ Nginxのログは`/var/log/nginx/access.log`及び`/var/log/nginx/error.log`, Su
 また, アプリケーションのログは`/var/log/app.log`に設置されています.
 ｢アプリケーションが起動しているが, エラーが出ている｣という場合には, ここを見てみましょう.
 
-### コラム: Vagrantのplugin
+# コラム: Vagrantのplugin
 
 Vagrantには, プラグインシステムが用意されています.
 プラグインを利用することで, Vagrantを更に便利に使う事が出来るようになります.
@@ -727,7 +718,7 @@ Vagrantには, プラグインシステムが用意されています.
 
 スナップショットの保存とロールバックを使いこなせば, 先程挑戦したような環境構築も非常に取り組みやすくなります.
 
-### まとめ
+# まとめ
 
 Vagrantを活用すれば, ローカル環境から独立した仮想マシンという環境を, 短期間で用意することが出来るようになります.
 仮想マシンは削除も簡単ですので, 気軽に使い潰すことができます.
