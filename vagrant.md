@@ -100,7 +100,7 @@ ubuntu/trusty64 (virtualbox, 14.04)
 
 ## 練習問題
 
-Discovery Vagrant Boxesから, CentOS 6.6及びCentOS 6.7のBoxを検索し, 取得してみよう.
+Discovery Vagrant Boxesから, CentOS 6.6のBoxを検索し, 取得してみよう.
 
 # Vagrantfileの準備
 
@@ -360,7 +360,6 @@ vagrant@app:~$
 ```
 
 このように直接利用する鍵を指定することで, `ssh`コマンドで接続することもできます.
-このようなコマンドでも, 仮想マシン(この場合は｢app｣の仮想マシン)
 
 その他, Vagrantfileで設定できる項目については, [公式ドキュメント](http://docs.vagrantup.com/v2/vagrantfile/index.html)([日本語版](http://lab.raqda.com/vagrant/vagrantfile/index.html))に記載があります.
 
