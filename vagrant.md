@@ -518,7 +518,7 @@ Vagrantfile
 
 # 練習問題
 
-適当なAmon2アプリケーションを, NginxとSupervisorを利用してVagrant上で動かせるように, 環境構築をしてみましょう.
+次に示す手順に従って, 適当なAmon2アプリケーションを, NginxとSupervisorを利用してVagrant上で動かせるように, 環境構築をしてみましょう.
 
 ## アプリケーションの用意
 
