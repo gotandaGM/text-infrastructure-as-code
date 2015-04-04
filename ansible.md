@@ -385,6 +385,7 @@ Note: The error may actually appear before this position: line 5, column 5
 ## 練習問題
 
 Vagrantの｢練習問題｣において手動で行った環境構築を, Ansibleを利用して自動化してみましょう(Amon2::Liteアプリケーションの準備や, Vagrantfileの用意と起動などは手動で行ってください).
+`build.yml`というファイルを用意し, ここにPlaybookを書いていきましょう.
 
 ```
 - hosts: app
@@ -404,11 +405,120 @@ Vagrantの｢練習問題｣において手動で行った環境構築を, Ansib
 
 ## 複雑なPlaybook
 
-...
+先程の練習問題では, 環境構築に必要なタスクを全て`build.yml`に記述しました.
+しかし, 1つのファイルに全てのタスクを書いてしまうと, 1ファイルにおける記述量が大量になってしまいます.
+そのため, Ansibleではタスクを｢ロール｣という単位で分割することが出来るようになっています.
+
+ここでは, 先程の練習問題で書いたPlaybookのタスクのうち, Perlのインストールに関連する部分を, `perl`というロールに切り分けてみます.
+まずは, `build.yml`側の変更です.
+
+```
+- hosts: app
+  sudo: yes
+  gather_facts: no
+  roles:
+    - perl
+```
+
+`tasks`の変わりに`roles`という設定が入り, これから作る`perl`というロールを指定しています.
+
+一方, 具体的なタスクについては, `/roles/[role名]/tasks/main.yml`に記載することになります.
+今回の場合, ロールの名前は`perl`なので, `roles/perl/tasks/main.yml`に転記しましょう.
+
+```
+vi roles/perl/tasks/main.yml
+- name: Install git
+  apt: name=git
+- name: Clone xbuild
+  git: repo=https://github.com/tagomoris/xbuild.git dest=/tmp/xbuild
+- name: Install Perl (and App::cpanminus and Carton)
+  shell: /tmp/xbuild/perl-install 5.20.1 /opt/perl-5.20
+```
+
+今回の場合, ロールへの切り出しはこれで完了です.
+`tree`コマンドでディレクトリ構成を見てみると, 次のようになっているはずです.
+
+```
+.
+├── Vagrantfile
+├── hosts
+├── roles
+│   └── perl
+│       └── tasks
+│           └── main.yml
+└── sample-playbook.yml
+```
+
+では, `ansible-playbook`コマンドでPlaybookを(再度)実行してみましょう.
+
+```
+$ ansible-playbook -i hosts build.yml
+
+PLAY [app] ********************************************************************
+
+TASK: [perl | Install git] ****************************************************
+ok: [vagrant]
+
+TASK: [perl | Clone xbuild] ***************************************************
+ok: [vagrant]
+
+TASK: [perl | Install Perl (and App::cpanminus and Carton)] *******************
+changed: [vagrant]
+
+PLAY RECAP ********************************************************************
+vagrant                    : ok=3    changed=1    unreachable=0    failed=0
+```
+
+ロールに切りだす前と同じ処理が, 問題なく実行することができましたね.
+
+### ロールのディレクトリ構成
+
+先程, ロールではタスクを`/roles/[role名]/tasks/main.yml`に配置する, と説明しました.
+Ansibleのロールでは, このようなディレクトリやファイル構成が重要で, `tasks`以外にも`vars`や`meta`, `templates`, `files`などを指定することが出来ます.
+これらの設定によって, 複雑な環境構築手順もシンプルに記述することが出来るようになります.
+
+#### `/roles/[role名]/tasks/main.yml`
+
+前述のように, ロールとして実行するタスクを記載するファイルです.
+
+#### `/roles/[role名]/vars/main.yml`
+
+`/roles/[role名]/tasks/main.yml`で利用する変数を定義出来るファイルです.
+変数の定義方法については, `vars_files`で指定する場合と同様です.
+
+#### `/roles/[role名]/meta/main.yml`
+
+ロールの依存関係を定義出来ます.
+例えば, 以下のような記述をした場合, このロールを実行する前に依存関係のある`foobar`というロールを実行してから, 現在のロールを実行します.
+
+Nginxの設定ファイルを配置するロールにおいて, Nginxをインストールするロールを依存として指定しておく, といった場合に利用できます.
+
+```
+dependencies:
+  - { role: foobar }
+```
+
+#### `/roles/[role名]/files/main.yml`
+
+`/roles/[role名]/tasks/main.yml`内で`copy`モジュールを利用する際に使えるファイルを配置するディレクトリです.
+例えば, このディレクトリ内に`foobar.txt`というファイルがあったとすると, そのファイルは`copy`モジュールで`src=foobar.txt`と指定することで利用することができます.
+
+#### `/roles/[role名]/templates/main.yml`
+
+`/roles/[role名]/tasks/main.yml`内で`template`モジュールを利用する際に使えるテンプレートを配置するディレクトリです.
+例えば, このディレクトリ内に`template.txt`というファイルがあったとすると, そのテンプレートは`template`モジュールで`src=template.txt`と指定することで利用することができます.
+
+## コラム: 階層的なロール名
+
+`/roles/[role名]/tasks/main.yml`について, `[ロール名]`の部分は階層的にすることが出来ます.
+例えば, `carton install`をするロールを, `/roles/perl/carton/tasks/main.yml`などの形で設置することも出来ます.
+
+但し, これまで見てきたように, ロールを構成するディレクトリ名として`vars`や`meta`, `templates`, `files`などは既に利用されているので, これらの名前は避けなければなりません.
 
 ## 練習問題
 
-...
+前の練習問題で作ったPlaybook中のタスクを, ロールを使って整理してみよう.
+時間があれば, 仮想マシンを初期化した上で, もう一度最初からPlaybookを適用してみましょう.
 
 ## まとめ
 
