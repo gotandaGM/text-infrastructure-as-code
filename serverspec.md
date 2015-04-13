@@ -468,11 +468,6 @@ Ansible Playbookで自動的に構築出来るようにした`SampleApp`につ�
 (実際に`SampleApp`では利用していませんが)Ansible Playbookを変更して, 仮想マシン内にMySQLをインストールしましょう.
 また, ServerspecでMySQLについてテストするようにしましょう.
 
-### SELinux
-
-Ansible Playbookを変更して, SELinuxを`disabled`に変更しましょう.
-また, ServerspecでSELinuxが`disabled`であるかどうかテストするようにしましょう.
-
 ## まとめ
 
 サーバの環境をテストするためのServerspecについて解説しました.
